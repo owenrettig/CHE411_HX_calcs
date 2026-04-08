@@ -69,7 +69,8 @@ def hx_analysis(sheet_name):
         Od  = 0.25  * 0.0254   # m  — tube outer diameter
         id_ = 0.206 * 0.0254   # m  — tube inner diameter
         sd  = 3     * 0.0254   # m  — shell inner diameter
-        N_t = 60               #    — number of tubes
+        c_F = 1.00             # potentially used as a correction factor for number of tubes 
+        N_t = 60 * c_F         #    — number of tubes
         l_t = 35    * 0.0254   # m  — tube length
 
         A_i = N_t * np.pi * id_ * l_t
@@ -110,8 +111,8 @@ def hx_analysis(sheet_name):
         Q_calc    = Uo * A_o * deltaTLM
 
         # Free-convection loss from outer shell surface 
-        T_inf  = 21       # °C  (ambient)
-        rel_H  = 0.4      # —   (relative humidity)
+        T_inf  = (data.loc[0, 'T_ambient(F)'] - 32) * (5/9)      # °C  (ambient)
+        rel_H  = data.loc[0, 'rel_hum']                          # —   (relative humidity)
         T_K    = T_inf + 273.15
         P_atm  = 101325   # Pa
 
@@ -146,8 +147,8 @@ def hx_analysis(sheet_name):
         print(f"| {'EXPERIMENTAL':^81} |")
         print(bar)
         print(f"|  Tube-side heat absorbed  (Qc):           {1000*Qc:>10.6g} W{' '*28}|")
-        print(f"|  Shell-side heat released (Qh):           {-1000*Qh:>10.6g} W{' '*28}|")
-        print(f"|  Heat loss (Q_loss = Qc + Qh):            {1000*Q_loss_exp:>10.4f} W{' '*28}|")
+        print(f"|  Shell-side heat absorbed (Qh):           {1000*Qh:>10.6g} W{' '*28}|")
+        print(f"|  Heat loss (Q_loss = -Qc - Qh):           {1000*Q_loss_exp:>10.4f} W{' '*28}|")
         print(bar)
 
         print(f"| {'CALCULATED':^81} |")
@@ -157,6 +158,7 @@ def hx_analysis(sheet_name):
         print(f"|  Overall U  (Uo, outer area basis):       {Uo:>10.6g} W/m²·K{' '*23}|")
         print(f"|  Predicted heat transfer (Q_calc):        {Q_calc:>10.6g} W{' '*28}|")
         print(f"|  Free-convection shell loss (Q_loss_air): {Q_loss_air:>10.6g} W{' '*28}|")
+        # print(f"Re: {Re_t:>10.6g}")
         print(bar)
         print()
 
