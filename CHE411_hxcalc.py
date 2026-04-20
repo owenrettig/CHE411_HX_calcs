@@ -85,11 +85,12 @@ def hx_analysis(sheet_name):
         # CALCULATED  (hxcalc_2)
 
         #  Shell-side convection (ho) 
-        De      = (4*(St/2)*(0.86*St) - np.pi*(Od**2)/8) / (np.pi*Od/2)   # equivalent diameter from Janna (p605)
+        De      = 4*((St/2)*(0.86*St) - np.pi*(Od**2)/8) / (np.pi*Od/2)   # equivalent diameter from Janna (p605)
         A_shell = np.pi*(sd/2)**2 - N_t*(Od/2)**2*np.pi                   # flow area
         Re_s    = hflowrate * De / (warm_water.nu * A_shell)
         Nu_s    = 0.36 * (Re_s**0.55) * warm_water.Prandt**(1/3)
         ho      = Nu_s * warm_water.k / De
+
 
         #  Tube-side convection (hi) — Sieder-Tate (laminar) 
         Re_t = 4 * cflowrate / (np.pi * cold_water.nu * id_ * N_t)
@@ -129,7 +130,7 @@ def hx_analysis(sheet_name):
         g      = 9.81
         T_surf = data.loc[0, 'avg_surf_temp']          # °C
         T_film = (T_surf + T_inf) / 2                  # °C
-        beta   = 1 / T_film                            # 1/K
+        beta   = 1 / (T_film + 273.15)                 # 1/K
 
         Ra_D       = (g * beta * (T_surf - T_inf) * sd**3) / (alpha_air * nu_air)
         Nu_air     = (0.6 + (0.387*Ra_D**(1/6)) / (1 + (0.559/Pr_air)**(9/16))**(8/27))**2
